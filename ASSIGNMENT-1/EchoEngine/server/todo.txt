@@ -1,0 +1,6 @@
+egg
+milk
+bread
+jam
+butter
+vegetable
