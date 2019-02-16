@@ -70,20 +70,45 @@ int main(void){
 		perror("ftok\n");
 		exit(1);
 	}
-	key3=ftok("man3.txt",'b');
-	key5=ftok("man5.txt",'c');
-	key7=ftok("man7.txt",'d');
-	key9=ftok("man9.txt",'e');
+	if((key3=ftok("man3.txt",'b'))== -1){
+		perror("ftok\n");
+		exit(1);
+	}
+	if((key5=ftok("man5.txt",'c'))== -1){
+		perror("ftok\n");
+		exit(1);
+	}
+	if((key7=ftok("man7.txt",'d'))== -1){
+		perror("ftok\n");
+		exit(1);
+	}
+	if((key9=ftok("man9.txt",'e'))== -1){
+		perror("ftok\n");
+		exit(1);
+	}
 	
 	while(1){
 	if((mid1=msgget(key1,0777 | IPC_CREAT))==-1){
 		perror("msgget\n");
 		exit(1);
 	}
-	mid3 = msgget(key3,0777 | IPC_CREAT);
-	mid5 = msgget(key5,0777 | IPC_CREAT);
-	mid7 = msgget(key7,0777 | IPC_CREAT);
-	mid9 = msgget(key9,0777 | IPC_CREAT);
+	else if((mid3 = msgget(key3,0777 | IPC_CREAT))==-1){
+		perror("msgget\n");
+		exit(1);
+	}
+	else if((mid5 = msgget(key5,0777 | IPC_CREAT))==-1){
+		perror("msgget\n");
+		exit(1);
+	}
+	else if((mid7 = msgget(key7,0777 | IPC_CREAT))==-1){
+		perror("msgget\n");
+		exit(1);
+	}
+	else if((mid9 = msgget(key9,0777 | IPC_CREAT))==-1){
+		perror("msgget\n");
+		exit(1);
+	}
+	
 	//client A
 	if(msgrcv(mid1,&mbuff1,sizeof(mbuff1),1,0) != -1){
 		for(i = 0; i<5;i++){
@@ -106,7 +131,7 @@ int main(void){
 
  	//client B
 	
-	if(msgrcv(mid3,&mbuff2,sizeof(mbuff2),1,0) != -1){
+	else if(msgrcv(mid3,&mbuff2,sizeof(mbuff2),1,0) >= 1){
 		for(i = 0; i<5;i++){
 		if(mbuff2.text[i] >= 'A' && mbuff2.text[i] <= 'Z')
 			mbuff2.text[i] = mbuff2.text[i] + 32;
@@ -126,7 +151,7 @@ int main(void){
 	}
 	//client C
 
-	if(msgrcv(mid5,&mbuff3,sizeof(mbuff3),1,0) != -1){
+	else if(msgrcv(mid5,&mbuff3,sizeof(mbuff3),1,0) >= 1){
 		for(i = 0; i<5;i++){
 		if(mbuff3.text[i] >= 'A' && mbuff3.text[i] <= 'Z')
 			mbuff3.text[i] = mbuff3.text[i] + 32;
@@ -146,7 +171,7 @@ int main(void){
 	}	
 	//client D
 	
-	if(msgrcv(mid7,&mbuff4,sizeof(mbuff4),1,0) != -1){
+	else if(msgrcv(mid7,&mbuff4,sizeof(mbuff4),1,0) >= 1){
 		for(i = 0; i<5;i++){
 		if(mbuff4.text[i] >= 'A' && mbuff4.text[i] <= 'Z')
 			mbuff4.text[i] = mbuff4.text[i] + 32;
@@ -166,7 +191,7 @@ int main(void){
 	}
 	//client E
 
-	if(msgrcv(mid9,&mbuff5,sizeof(mbuff5),1,0) != -1){
+	else if(msgrcv(mid9,&mbuff5,sizeof(mbuff5),1,0) >= 1){
 		for(i = 0; i<5;i++){
 		if(mbuff5.text[i] >= 'A' && mbuff5.text[i] <= 'Z')
 			mbuff5.text[i] = mbuff5.text[i] + 32;
