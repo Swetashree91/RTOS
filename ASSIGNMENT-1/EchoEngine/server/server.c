@@ -87,7 +87,7 @@ int main(void){
 		exit(1);
 	}
 	
-	while(1){
+	
 	if((mid1=msgget(key1,0777 | IPC_CREAT))==-1){
 		perror("msgget\n");
 		exit(1);
@@ -108,7 +108,7 @@ int main(void){
 		perror("msgget\n");
 		exit(1);
 	}
-	
+	while(1){
 	//client A
 	if(msgrcv(mid1,&mbuff1,sizeof(mbuff1),1,0) != -1){
 		for(i = 0; i<5;i++){
