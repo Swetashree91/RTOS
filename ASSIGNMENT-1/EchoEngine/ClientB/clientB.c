@@ -8,47 +8,46 @@
 
 
 
-struct mb_send1{
+struct mb_send2{
 	long type;
 	char text[5];
-}mbuff1;
+}mbuff2;
 
-struct mb_recv1{
+struct mb_recv2{
 	long typ;
 	char txt[5];
-}mbuf1;
+}mbuf2;
 
 int main(void){
-	
-	int mid1,mid2;
-	key_t key1,key2;
+	int mid3,mid4;
+	key_t key3,key4;
 
-	if((key1=ftok("/home/sweta/rtos/assgn1/Server/man1.txt",'a'))== -1){
+	if((key3=ftok("/home/sweta/rtos/assgn1/Server/man3.txt",'b'))== -1){
 		perror("ftok\n");
 		exit(1);
 	}
-	if((mid1=msgget(key1,0777 | IPC_CREAT))==-1){
+	if((mid3=msgget(key3,0777 | IPC_CREAT))==-1){
 		perror("msgget\n");
 		exit(1);
 	}
 	printf("\nEnter a character: ");
 	
-	mbuff1.type = 1;
+	mbuff2.type = 1;
+	//	
+	gets(mbuff2.text);
+
+	msgsnd(mid3,&mbuff2,sizeof(mbuff2),0);	
 	
-	gets(mbuff1.text);
-	
-	msgsnd(mid1,&mbuff1,sizeof(mbuff1),0);	
-	
-	if(msgctl(mid1,IPC_RMID,NULL)==-1){
+	if(msgctl(mid3,IPC_RMID,NULL)==-1){
 		perror("msgctl\n");
 		exit(1);
 	}
 	
 	//letter received from server
-	key2=ftok("/home/sweta/rtos/assgn1/Server/man2.txt",'a');
-	mid2=msgget(key2,0777 | IPC_CREAT);
-	msgrcv(mid2,&mbuf1,sizeof(mbuf1),1,0);	
-	printf("\nData received from server:  %s\n",mbuf1.txt);
+	key4=ftok("/home/sweta/rtos/assgn1/Server/man4.txt",'b');
+	mid4=msgget(key4,0777 | IPC_CREAT);
+	msgrcv(mid4,&mbuf2,sizeof(mbuf2),1,0);	
+	printf("\nData received from server:  %s\n",mbuf2.txt);
 
 	return 0;
 }
