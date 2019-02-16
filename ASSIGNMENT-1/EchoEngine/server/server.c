@@ -131,7 +131,7 @@ int main(void){
 
  	//client B
 	
-	else if(msgrcv(mid3,&mbuff2,sizeof(mbuff2),1,0) != 1){
+	if(msgrcv(mid3,&mbuff2,sizeof(mbuff2),1,0) != -1){
 		for(i = 0; i<5;i++){
 		if(mbuff2.text[i] >= 'A' && mbuff2.text[i] <= 'Z')
 			mbuff2.text[i] = mbuff2.text[i] + 32;
@@ -151,7 +151,7 @@ int main(void){
 	}
 	//client C
 
-	else if(msgrcv(mid5,&mbuff3,sizeof(mbuff3),1,0) != 1){
+	if(msgrcv(mid5,&mbuff3,sizeof(mbuff3),1,0) != -1){
 		for(i = 0; i<5;i++){
 		if(mbuff3.text[i] >= 'A' && mbuff3.text[i] <= 'Z')
 			mbuff3.text[i] = mbuff3.text[i] + 32;
@@ -171,7 +171,7 @@ int main(void){
 	}	
 	//client D
 	
-	else if(msgrcv(mid7,&mbuff4,sizeof(mbuff4),1,0) != 1){
+	if(msgrcv(mid7,&mbuff4,sizeof(mbuff4),1,0) != -1){
 		for(i = 0; i<5;i++){
 		if(mbuff4.text[i] >= 'A' && mbuff4.text[i] <= 'Z')
 			mbuff4.text[i] = mbuff4.text[i] + 32;
@@ -191,7 +191,7 @@ int main(void){
 	}
 	//client E
 
-	else if(msgrcv(mid9,&mbuff5,sizeof(mbuff5),1,0) != 1){
+	if(msgrcv(mid9,&mbuff5,sizeof(mbuff5),1,0) != -1){
 		for(i = 0; i<5;i++){
 		if(mbuff5.text[i] >= 'A' && mbuff5.text[i] <= 'Z')
 			mbuff5.text[i] = mbuff5.text[i] + 32;
