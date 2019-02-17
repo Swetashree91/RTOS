@@ -40,7 +40,7 @@ int main(void){
 	key2=ftok("man3.txt",'a');
 	midb=msgget(key2,0644 | IPC_CREAT);
 	msg2.typ = 1;
-	
+		while(1){
 		msgrcv(mida,&msg1,sizeof(msg1),1,0);
 		printf("\nData received from Client A. : %s\n",msg1.text);
 			strcpy(path,msg1.text);
@@ -59,7 +59,7 @@ int main(void){
 		
 	
 			fclose(fp);
-	
+		}
 
 	msgctl(midb,IPC_RMID,NULL);
 	return 0;
