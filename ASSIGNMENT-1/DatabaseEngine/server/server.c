@@ -59,7 +59,7 @@ int main(void){
 		
 	
 			fclose(fp);
-		}
+			}
 
 	msgctl(midb,IPC_RMID,NULL);
 	return 0;
