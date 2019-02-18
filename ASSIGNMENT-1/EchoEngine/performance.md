@@ -1,7 +1,7 @@
 |**No of clients** | **Time taken by server**|
 ---------------- | --------------------------
-|        one     |         311us             |
-|        two     |         0m16.497s         |    
-|        three   |         0m21.004s         |                  
-|        four    |         0m30.150s         |      
-|        five    |         0m39.569s         |      
+|        one     |         112us             |
+|        two     |         153us             |    
+|        three   |         164us             |                  
+|        four    |         187us             |      
+|        five    |         221us             |      
