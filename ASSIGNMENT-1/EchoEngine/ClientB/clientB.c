@@ -5,7 +5,7 @@
 #include<sys/ipc.h>
 #include<sys/msg.h>
 #include<string.h>
-
+#include<sys/time.h>
 
 
 struct mb_send2{
@@ -19,6 +19,7 @@ struct mb_recv2{
 }mbuf2;
 
 int main(void){
+	struct timeval t1,t2;
 	int mid3,mid4;
 	key_t key3,key4;
 
@@ -34,8 +35,8 @@ int main(void){
 	
 	mbuff2.type = 1;
 	//	
-	gets(mbuff2.text);
-
+	scanf("%s",mbuff2.text);
+	gettimeofday(&t1,NULL);
 	msgsnd(mid3,&mbuff2,sizeof(mbuff2),0);	
 	
 	if(msgctl(mid3,IPC_RMID,NULL)==-1){
@@ -47,8 +48,10 @@ int main(void){
 	key4=ftok("/home/sweta/rtos/assgn1/Server/man4.txt",'b');
 	mid4=msgget(key4,0777 | IPC_CREAT);
 	msgrcv(mid4,&mbuf2,sizeof(mbuf2),1,0);	
+	gettimeofday(&t2,NULL);
 	printf("\nData received from server:  %s\n",mbuf2.txt);
-
+	
+	printf("\n time by B:%lu",t2.tv_usec-t1.tv_usec);
 	return 0;
 }
 
