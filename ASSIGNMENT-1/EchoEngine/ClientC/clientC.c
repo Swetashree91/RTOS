@@ -32,9 +32,10 @@ int main(void){
 		perror("msgget\n");
 		exit(1);
 	}
+	mbuff3.type = 1;
 	printf("\nEnter a character: ");
 	
-	mbuff3.type = 1;
+	
 	scanf("%s",mbuff3.text);
 	gettimeofday(&t1,NULL);
 
