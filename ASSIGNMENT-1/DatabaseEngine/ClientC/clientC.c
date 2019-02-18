@@ -1,53 +1,58 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<sys/types.h>
-#include<sys/ipc.h>
-#include<sys/msg.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <error.h> 
+#include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h> 
+#include <sys/msg.h> 
+#include <sys/time.h>
 
+struct msg_queue { 
+    long mtype; 
+    char mtext[100]; 
+};
 
+int main() 
+{ 
+    struct timeval t1, t2;
+    struct msg_queue buf;
+    key_t key; 
+    int msgid;
+    
+    if((key = ftok("/home/sweta/rtos/assgn1a/Server/man.txt", 'b')) == -1){
+        perror("ftok");
+        exit(1);
+    } 
+  
+    if((msgid = msgget(key, 0644)) == -1){
+        perror("msgget");
+        exit(1);
+    } 
 
-struct mb_send{
-	long type;
-	char text[100];
-}msg1;
+    while(1) {
+        buf.mtype = 1; 
+        
+        printf("Enter file name: ");
+        
+        if(fgets(buf.mtext, sizeof buf.mtext, stdin) != NULL) {
+            int len = strlen(buf.mtext);
+            
+            if (buf.mtext[len-1] == '\n') buf.mtext[len-1] = '\0';
+            strcat(buf.mtext, "3");
+            
+            gettimeofday(&t1, NULL);
+            
+            msgsnd(msgid, &buf, len+1, 0);
+               
 
-struct mb_recv{
-	long typ;
-	char txt[100];
-}msg2;
+        }
 
-int main(void){
-	
-	int mida,midb;
-	key_t key1,key2;
-
-	if((key1=ftok("/home/sweta/rtos/assgn1a/Server/123.txt",'b'))== -1){
-		perror("ftok\n");
-		exit(1);
-	}
-	if((mida=msgget(key1,0644 | IPC_CREAT))==-1){
-		perror("msgget\n");
-		exit(1);
-	}
-	printf("\nEnter a file name: ");
-	
-	fgets(msg1.text,sizeof(msg1.text),stdin);
-	msg1.type = 1;
-	msgsnd(mida,&msg1,sizeof(msg1),0);	
-	printf("\ndata sent to server is : %s",msg1.text);
-	if(msgctl(mida,IPC_RMID,NULL)==-1){
-		perror("msgctl\n");
-		exit(1);
-	}
-	
-	key2=ftok("/home/sweta/rtos/assgn1a/Server/man3.txt",'a');
-	midb=msgget(key2,0644 | IPC_CREAT);
-	msgrcv(midb,&msg2,sizeof(msg2),1,0);	
-	printf("\nData received from server:  %s\n",msg2.txt);
-
-	return 0;
-}
-
-	
+        msgrcv(msgid, &buf, sizeof buf.mtext, 4, 0);
+        
+        gettimeofday(&t2, NULL);
+        
+        printf("time by C: %lu\n",t2.tv_usec - t1.tv_usec);  
+    }
+    
+    return 0; 
+} 
