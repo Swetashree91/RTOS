@@ -37,7 +37,7 @@ int main()
         if(fgets(buf.mtext, sizeof buf.mtext, stdin) != NULL) {
             int len = strlen(buf.mtext);
             
-            //if (buf.mtext[len-1] == '\n') buf.mtext[len-1] = '\0';
+            if (buf.mtext[len-1] == '\n') buf.mtext[len-1] = '\0';
             strcat(buf.mtext, "1");
             
             gettimeofday(&t1, NULL);
