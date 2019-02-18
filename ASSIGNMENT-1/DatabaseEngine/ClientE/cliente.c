@@ -46,7 +46,7 @@ int main()
                
 
         }
-
+        msgctl(msgid,IPC_RMID,NULL);
         msgrcv(msgid, &buf, sizeof buf.mtext, 6, 0);
         
         gettimeofday(&t2, NULL);
