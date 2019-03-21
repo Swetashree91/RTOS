@@ -52,6 +52,9 @@ fseek(fp,5,SEEK_SET);
 fclose(fp);
 printf("data required.\n"); 
 	while(1) {
+		printf("\n get data.");
+		
+		sleep(2);
   		if((recv(sock_fd,buffer,sizeof(buffer),0)) < 0) {
 			printf("\nCould not receive.");
 			exit(1);
