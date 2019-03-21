@@ -9,15 +9,17 @@
 #include <netinet/in.h> 
 #include <sys/time.h> 
 
-#define PORT 5220
+#define PORT 5330
 
 int main() {
 struct sockaddr_in address;
 int sock_fd, val, new_socket;
-int opt = 1;
-char buffer[1000],c;
+int opt = 1,addr_length;
+char buffer[1000];
+char temp[5],humid[5],gas1[5],gas2[5],gas3[5];
+struct timeval t;
 
-FILE *fp1,*fp2,*fp3,*fp4,*fp5;
+FILE *fp;
  
  sock_fd = socket(AF_INET, SOCK_STREAM, 0);
  if (sock_fd < 0) {
@@ -42,78 +44,56 @@ address.sin_port = htons( PORT );
 	} 
  
  printf("Waiting for a connection...\n");
- listen(sock_fd, 5);
-
- 		int addrlen = sizeof(address); 
- 		new_socket = accept(sock_fd, (struct sockaddr *) &address, &addrlen);
-		printf("\n new socket fd : %d",new_socket);
- 		if (new_socket < 0) {
-  		printf("\nError accepting connection!\n");
+ listen(sock_fd, 1);
+addr_length = sizeof(address);
+while(1) {
+ 	new_socket = accept(sock_fd, (struct sockaddr *) &address, &addr_length);
+	printf("\n new socket fd : %d",new_socket);
+ 	if (new_socket < 0) {
+  		printf("\nError accepting connection.\n");
    		exit(1);
 		}
   	
-printf("\nConnection accepted.\n");
-  	
- while(1)
-	{
-	fp1 = fopen("sensor1.txt","r"); 
-   	fp2 = fopen("sensor2.txt","r");  
-    	fp3 = fopen("sensor3.txt","r"); 
-    	fp4 = fopen("sensor4.txt","r"); 
-    	fp5 = fopen("sensor5.txt","r");	
-  	c = fgetc(fp1); 
-      	int i=0;
-      	while (c != EOF) { 
-         buffer[i] = c;
-         i++;
-         c = fgetc(fp1);
-       	} 
-         buffer[i] = ' ';
-         i++;
-  	c = fgetc(fp2); 
-      	while (c != EOF) { 
-         buffer[i] = c;
-         i++;
-         c = fgetc(fp2);
-       	} 
-         buffer[i] = ' ';
-         i++;
-  	c = fgetc(fp3); 
-     	while (c != EOF) { 
-         buffer[i] = c;
-         i++;
-         c = fgetc(fp3);
-       	}  
-         buffer[i] = ' ';
-         i++; 
-	c = fgetc(fp4); 
-      	while (c != EOF) { 
-         buffer[i] = c;
-         i++;
-         c = fgetc(fp4);
-       	}  
-         buffer[i] = ' ';
-         i++;
- 	c = fgetc(fp5); 
-      	while (c != EOF) { 
-         buffer[i] = c;
-         i++;
-         c = fgetc(fp5);
-      	 } 
-	if(send(new_socket,buffer,sizeof(buffer),0) < 0) {   
-     		printf("\nError sending data.\n");  
-     		exit(1); 
-    	}
-	
- 	printf("Sent data: %s\n", buffer);
-	sleep(2);
-	fclose(fp1);
-	fclose(fp2);
-	fclose(fp3);
-	fclose(fp4);
-	fclose(fp5);
+  while(1){
+	 memset(buffer, 0, sizeof(buffer));
+    	 gettimeofday(&t,NULL);
+      	 if(recvfrom(new_socket, buffer, sizeof(buffer), 0, (struct sockaddr *) &address, &addr_length)<0) {
+     		printf("\nError in receiving .\n");  
+     		exit(1);
+    		}
+    	 if(strcmp(buffer,"get data")==0) {
 
-  	//close(new_socket);
+      		fp = fopen("sensor1.txt", "r");
+      		fscanf(fp, "%s", temp);
+      		fclose(fp);
+     
+      		fp = fopen("sensor2.txt", "r");
+      		fscanf(fp, "%s", humid);
+      		fclose(fp);
+      
+      		fp = fopen("sensor3.txt", "r");
+      		fscanf(fp, "%s", gas1);
+     		fclose(fp);
+      
+      		fp = fopen("sensor4.txt", "r");
+      		fscanf(fp, "%s", gas2);
+      		fclose(fp);
+      
+      		fp = fopen("sensor5.txt", "r");
+      		fscanf(fp, "%s", gas3);
+      		fclose(fp);
+		memset(buffer, 0, sizeof(buffer));
+      		sprintf(buffer,"%lu %s %s %s %s %s",t.tv_usec,temp,humid,gas1,gas2,gas3);
+       
+       		if(sendto(new_socket, buffer, sizeof(buffer), 0, (struct sockaddr *) &address, addr_length)<0)  {   
+       			printf("\nError sending sensor data.");  
+       			exit(1);     
+    		}
+	
+ 		printf("\nSent sensor data: %s", buffer);
+	}
+	}
+  	close(new_socket);
 }
-return 0;
+	return 0;
 }
