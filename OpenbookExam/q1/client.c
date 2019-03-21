@@ -1,19 +1,21 @@
-#include<stdio.h>  
-#include<stdlib.h> 
+#include <stdio.h> 
+#include <string.h> 
+#include <stdlib.h> 
+#include <errno.h> 
 #include <unistd.h> 
-#include<sys/types.h> 
-#include<sys/socket.h>
-#include<string.h>
-#include<netinet/in.h> 
-#include<netdb.h>
-#include <sys/time.h>
+#include <arpa/inet.h> 
+#include <sys/types.h> 
+#include <sys/socket.h> 
+#include <netinet/in.h> 
+#include <sys/time.h> 
   
-#define PORT 3090
+#define PORT 5220
 
 
 int main() {  
 int sock_fd, val;  
-char buffer[1000];  
+char buffer[1000]; 
+int opt = 1; 
 struct sockaddr_in serv_addr;
 
 struct timeval t;
@@ -25,39 +27,44 @@ FILE *fp;
   printf("Error creating socket!\n");  
   exit(1);  
  }  
- printf("Socket created...\n");   
+ printf("\nSocket created.\n");   
 
-memset(&serv_addr, '0', sizeof(serv_addr));  
+if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) 
+	{ 
+		perror("setsockopt"); 
+		exit(EXIT_FAILURE); 
+	}  
 serv_addr.sin_family = AF_INET; 
-serv_addr.sin_addr.s_addr = INADDR_ANY; 
+serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
 serv_addr.sin_port = htons( PORT );     
 
-if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0) 
-	{ 
-		printf("\nInvalid address.\n"); 
-		return -1; 
-	} 
-
-	if (connect(sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
-	{ 
-		printf("\nConnection Failed \n"); 
-		return -1; 
+if (connect(sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
+{ 
+	printf("\nConnection Failed \n"); 
+	return -1; 
 	}
 memset(buffer, 0, 1000);
  
-fp=fopen("data.csv","w");
+fp=fopen("data.txt","w");
 
 fprintf(fp,"Time Temp Humidity  Gas1  Gas2  Gas3\n");
+fseek(fp,5,SEEK_SET);
+fclose(fp);
 printf("data required.\n"); 
 	while(1) {
   		if((recv(sock_fd,buffer,sizeof(buffer),0)) < 0) {
 			printf("\nCould not receive.");
 			exit(1);
 		}
-		gettimeofday(&t,NULL);
-		fprintf(fp,"%lu",t.tv_usec);
-		fprintf(fp,"%s\n",buffer);
-   		printf("\n");
+		else {
+			gettimeofday(&t,NULL);
+			fp=fopen("data.csv","a");
+			printf("recvd data : %s",buffer);
+			fprintf(fp,"%lu",t.tv_usec);
+			fseek(fp,5,SEEK_SET);
+			fprintf(fp,"%s\n",buffer);
+   			fclose(fp); 
+		     }
 		}
 	fclose(fp);
  	return 0;    
