@@ -1,18 +1,20 @@
-#include<stdio.h>  
-#include<stdlib.h> 
+#include <stdio.h> 
+#include <string.h> 
+#include <stdlib.h> 
+#include <errno.h> 
 #include <unistd.h> 
-#include<sys/types.h> 
-#include<sys/socket.h>
-#include<string.h>
-#include<ctype.h>
-#include<netinet/in.h> 
-#include<netdb.h>
+#include <arpa/inet.h> 
+#include <sys/types.h> 
+#include <sys/socket.h> 
+#include <netinet/in.h> 
+#include <sys/time.h> 
 
-#define PORT 3090
+#define PORT 5220
 
 int main() {
- struct sockaddr_in address;
- int sock_fd, addrlen, val, new_socket;
+struct sockaddr_in address;
+int sock_fd, val, new_socket;
+int opt = 1;
 char buffer[1000],c;
 
 FILE *fp1,*fp2,*fp3,*fp4,*fp5;
@@ -24,44 +26,41 @@ FILE *fp1,*fp2,*fp3,*fp4,*fp5;
  }
  printf("Socket created...\n");
  
-memset(&address, '0', sizeof(address));
+if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) 
+	{ 
+		perror("setsockopt"); 
+		exit(EXIT_FAILURE); 
+	} 
 address.sin_family = AF_INET; 
 address.sin_addr.s_addr = INADDR_ANY; 
 address.sin_port = htons( PORT ); 
  
- val = bind(sock_fd, (struct sockaddr *) &address, sizeof(address));
- if (val < 0) {
-  printf("\nError in binding!\n");
-  exit(1);
- }
+ if (bind(sock_fd, (struct sockaddr *)&address, sizeof(address))<0) 
+	{ 
+		perror("\nbind failed"); 
+		exit(EXIT_FAILURE); 
+	} 
  
  printf("Waiting for a connection...\n");
  listen(sock_fd, 5);
 
- while(1) { 
- 	int addrlen = sizeof(address); 
- 	new_socket = accept(sock_fd, (struct sockaddr *) &address, &addrlen);
- 	if (new_socket < 0) {
-  	printf("\nError accepting connection!\n");
-   	exit(1);
-  	}
+ 		int addrlen = sizeof(address); 
+ 		new_socket = accept(sock_fd, (struct sockaddr *) &address, &addrlen);
+		printf("\n new socket fd : %d",new_socket);
+ 		if (new_socket < 0) {
+  		printf("\nError accepting connection!\n");
+   		exit(1);
+		}
+  	
 printf("\nConnection accepted.\n");
-
-inet_ntop(AF_INET, &(address.sin_addr), "127.0.0.1", 100);
-
-   while(1)
+  	
+ while(1)
 	{
-   	 fp1 = 0;
-    	fp1 = fopen("sensor1.txt","r"); 
- 	fp2 = 0;
+	fp1 = fopen("sensor1.txt","r"); 
    	fp2 = fopen("sensor2.txt","r");  
- 	fp3 = 0;
-    	fp3 = fopen("sensor3.txt","r");  
-	fp4 = 0;
+    	fp3 = fopen("sensor3.txt","r"); 
     	fp4 = fopen("sensor4.txt","r"); 
-	fp5 = 0; 
-    	fp5 = fopen("sensor5.txt","r");  
- 	
+    	fp5 = fopen("sensor5.txt","r");	
   	c = fgetc(fp1); 
       	int i=0;
       	while (c != EOF) { 
@@ -105,11 +104,16 @@ inet_ntop(AF_INET, &(address.sin_addr), "127.0.0.1", 100);
      		printf("\nError sending data.\n");  
      		exit(1); 
     	}
-
+	
  	printf("Sent data: %s\n", buffer);
 	sleep(2);
-}
-  close(new_socket);
+	fclose(fp1);
+	fclose(fp2);
+	fclose(fp3);
+	fclose(fp4);
+	fclose(fp5);
+
+  	//close(new_socket);
 }
 return 0;
 }
