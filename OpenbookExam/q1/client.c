@@ -9,66 +9,61 @@
 #include <netinet/in.h> 
 #include <sys/time.h> 
   
-#define PORT 5220
+#define PORT 5330
 
 
 int main() {  
-int sock_fd, val;  
+int sock_fd,opt = 1;  
 char buffer[1000]; 
-int opt = 1; 
-struct sockaddr_in serv_addr;
+struct sockaddr_in address;
 
-struct timeval t;
- 
 FILE *fp;
  
- sock_fd = socket(AF_INET, SOCK_STREAM, 0);  
- if (sock_fd < 0) {  
-  printf("Error creating socket!\n");  
-  exit(1);  
- }  
- printf("\nSocket created.\n");   
+sock_fd = socket(AF_INET, SOCK_STREAM, 0);  
+if (sock_fd < 0) {  
+  	printf("\nError creating socket.\n");  
+  	exit(1);  
+}  
 
 if (setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) 
 	{ 
 		perror("setsockopt"); 
 		exit(EXIT_FAILURE); 
 	}  
-serv_addr.sin_family = AF_INET; 
-serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
-serv_addr.sin_port = htons( PORT );     
+address.sin_family = AF_INET; 
+address.sin_addr.s_addr = inet_addr("127.0.0.1"); 
+address.sin_port = htons( PORT );     
 
-if (connect(sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
+if (connect(sock_fd, (struct sockaddr *)&address, sizeof(address)) < 0) 
 { 
-	printf("\nConnection Failed \n"); 
-	return -1; 
+	printf("\nConnection Failed.\n"); 
+	exit(1); 
 	}
-memset(buffer, 0, 1000);
+memset(buffer, 0, sizeof(buffer));
  
 fp=fopen("data.txt","w");
-
 fprintf(fp,"Time Temp Humidity  Gas1  Gas2  Gas3\n");
-fseek(fp,5,SEEK_SET);
 fclose(fp);
 printf("data required.\n"); 
-	while(1) {
-		printf("\n get data.");
-		
-		sleep(2);
-  		if((recv(sock_fd,buffer,sizeof(buffer),0)) < 0) {
-			printf("\nCould not receive.");
-			exit(1);
-		}
-		else {
-			gettimeofday(&t,NULL);
-			fp=fopen("data.csv","a");
-			printf("recvd data : %s",buffer);
-			fprintf(fp,"%lu",t.tv_usec);
-			fseek(fp,5,SEEK_SET);
-			fprintf(fp,"%s\n",buffer);
-   			fclose(fp); 
-		     }
-		}
-	fclose(fp);
- 	return 0;    
+	
+while(1) {
+	strcpy(buffer,"get data");
+  	sleep(2);
+  	if(sendto(sock_fd, buffer, sizeof(buffer), 0, (struct sockaddr *) &address, sizeof(address))<0) {
+  		printf("\nError sending.");
+		exit(1);  
+  		}
+	memset(buffer, 0, sizeof(buffer));
+  	if(recvfrom(sock_fd, buffer, sizeof(buffer), 0, NULL, NULL)<0) { 
+   		printf("\nError receiving.\n"); 
+		exit(1);   
+  		}
+  	else {
+   	fp = fopen("plant_data.txt","a");
+   	printf("Data received from sensor:%s\n",buffer);
+   	fprintf(fp,"%s\n",buffer);
+   	fclose(fp);
+  	}  
+ }
+return 0;    
 }
