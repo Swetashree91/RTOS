@@ -23,7 +23,7 @@ typedef struct packet{
 }Packet;
 
 typedef struct frame{    
-    int frame_kind; //ACK:0, SEQ:1 FIN:2
+    int frame_kind; //ACK:0, SEQ:1 
     int sq_no;
     int ack;
     Packet packet;
