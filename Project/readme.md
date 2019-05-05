@@ -36,6 +36,31 @@ The client will also wait for the positive ackwoledgement(ACK) before sending mo
 * Checking for correct message at server and sending ACK for correct message, NACK for wrong message.
 * If acknowledgement is not received within 5 secs, **TIMEOUT** occurs and the data needs to be retransmitted.
 
+## Timing Analysis for different BERs
+
+|     **BER**    |     **Time to ACK**       |
+---------------- | --------------------------
+|      0.001     |         225us             |
+|      0.002     |         310us             |    
+|      0.003     |         216us             |  
+|      0.004     |         239us             |
+|      0.005     |         310us             |    
+|      0.006     |         236us             |  
+|      0.007     |         360us             |
+|      0.008     |         269us             |    
+|      0.009     |         281us             |  
+|      0.01      |         337us             |
+|      0.02      |         211us             |    
+|      0.03      |         245us             |  
+|      0.04      |         1.844E19us        |
+|      0.05      |         1.886E19us        |    
+|      0.06      |         1.741E19us        |  
+|      0.07      |         1.889E19us        |
+|      0.08      |         1.895E19us        |    
+|      0.09      |         1.894E19us        |  
+|      0.1       |         1.888E19us        | 
+   
+
 ## Gaps in implementation:
 
 * We could not create a timeout scenario even though we have added it in the client program.
@@ -50,5 +75,17 @@ The client will also wait for the positive ackwoledgement(ACK) before sending mo
   whether the receiver has received the NACK because of error in NACK/ACK or because of error in data.
   
 ## Concepts for Reference:
+
+* [(https://www.sciencedirect.com/topics/engineering/cyclic-redundancy-check](https://www.sciencedirect.com/topics/engineering/cyclic-redundancy-check)
+* [https://www.geeksforgeeks.org/error-detection-computer-networks/](https://www.geeksforgeeks.org/error-detection-computer-networks/)
+* [https://www.hackerearth.com/practice/notes/akshaypai94/socket-programming-using-tcpip/](https://www.hackerearth.com/practice/notes/akshaypai94/socket-programming-using-tcpip/)
+* [https://www.cs.dartmouth.edu/~campbell/cs50/socketprogramming.html](https://www.cs.dartmouth.edu/~campbell/cs50/socketprogramming.html)
+* [https://www.computer-networking.info/1st/html/transport/principles.html](https://www.computer-networking.info/1st/html/transport/principles.html)
+
+
+
+
+
+
 
 
